@@ -1,4 +1,5 @@
 ﻿ using HSG.Numerics;
+using static Microsoft.FSharp.Core.ByRefKinds;
 
 namespace FsolveTester
 {
@@ -187,6 +188,88 @@ namespace FsolveTester
             // fx4 = Values of equations at soln4 (should be close to zero within Tolerance)
             // solutionCode4 = String providing information on exit code
             Fsolve.PrintArray("xSolution", soln4, 7);                // Prints the solution to '7' decimals
+
+
+
+            // ============================================
+            // ....... TEST 5 .............................
+            // ....... Non Linear System ..................
+            // ....... Unknown variables = 2 ..............
+            // ============================================
+            //
+            // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+            //
+            // Equations:
+            //
+            // e**(−e**(−(x1+x2))) = x2*(1+x1**2)
+            // x1*cos(x2) + x2*sin(x1) = 0.5
+            // 
+            // Solutions:
+            // 0.3532    0.6061
+
+            // STEP 1: 
+            // Define the callback function for this system
+            static void funcToSolve5(int n, IntPtr x, IntPtr fx)      // This is the function signature
+            {
+                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                fx1[0] = Math.Exp(-Math.Exp(-(x1[0] + x1[1]))) - x1[1] * (1.0 + x1[0] * x1[0]); // Write equations/functions as f(x) = 0
+                fx1[1] = x1[0] * Math.Cos(x1[1]) + x1[1] * Math.Sin(x1[0]) - 0.5;
+                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+            }
+            // STEP 2:
+            // Solve the function
+            Fsolve.FunctionToSolve func5 = new(funcToSolve5);        // Wrap function so it can be called
+            int unknownVariables5 = 2;                               // Give number of variables
+            double[] xGuess5 = { 0.0, 0.0 };  // Give a guess value
+            (double[] soln5, double[] fx5, string solutionCode5) = Fsolve.Fsolver(func5, unknownVariables5, xGuess5, Tolerance); // Call solver
+            // Returns solution:
+            // soln5= Array containing solution
+            // fx5 = Values of equations at soln5 (should be close to zero within Tolerance)
+            // solutionCode5 = String providing information on exit code
+            Fsolve.PrintArray("xSolution", soln5, 4);                // Prints the solution to '7' decimals
+
+
+
+            // ============================================
+            // ....... TEST 6 .............................
+            // ....... Non Linear System ..................
+            // ....... Unknown variables = 2 ..............
+            // ============================================
+            //
+            // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+            //
+            // Equations:
+            //
+            // 2x1 − x2  = e**(−x1)
+            // −x1 + 2x2 = e**(−x2)
+            //
+            // Solutions:
+            // 0.5671    0.5671
+
+            // STEP 1: 
+            // Define the callback function for this system
+            static void funcToSolve6(int n, IntPtr x, IntPtr fx)      // This is the function signature
+            {
+                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                fx1[0] = 2.0 * x1[0] - x1[1] - Math.Exp(-x1[0]);   // Write equations/functions as f(x) = 0
+                fx1[1] = -x1[0] + 2.0 * x1[1] - Math.Exp(-x1[1]);
+                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+            }
+            // STEP 2:
+            // Solve the function
+            Fsolve.FunctionToSolve func6 = new(funcToSolve6);        // Wrap function so it can be called
+            int unknownVariables6 = 2;                               // Give number of variables
+            double[] xGuess6 = { 0.0, 0.0 };  // Give a guess value
+            (double[] soln6, double[] fx6, string solutionCode6) = Fsolve.Fsolver(func6, unknownVariables6, xGuess6, Tolerance); // Call solver
+            // Returns solution:
+            // soln6= Array containing solution
+            // fx6 = Values of equations at soln6 (should be close to zero within Tolerance)
+            // solutionCode6 = String providing information on exit code
+            Fsolve.PrintArray("xSolution", soln6, 4);                // Prints the solution to '7' decimals
+
+
         }
     }
 }

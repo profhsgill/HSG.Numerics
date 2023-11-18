@@ -178,4 +178,86 @@ let main argv =
     // solutionCode4 = String providing information on exit code
     Fsolve.PrintArray "xSolution" soln4 7                  // Prints the solution to '7' decimals
 
+
+
+
+    // ============================================
+    // ....... TEST 5 .............................
+    // ....... Non Linear System ..................
+    // ....... Unknown variables = 2 ..............
+    // ============================================
+    //
+    // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+    //
+    // Equations:
+    //
+    // e**(−e**(−(x1+x2))) = x2*(1+x1**2)
+    // x1*cos(x2) + x2*sin(x1) = 0.5
+    // 
+    // Solutions:
+    // 0.3532    0.6061
+   
+    // STEP 1: 
+    // Define the callback function for this system
+    let funcToSolve5 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
+        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        fx1[0] <- exp(-exp(-(x1[0]+x1[1]))) - x1[1]*(1.0+x1[0]**2) // Write equations/functions as f(x) = 0
+        fx1[1] <- x1[0]*cos x1[1] + x1[1]*sin x1[0] - 0.5
+            
+        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        ()                                               // Returns equivalent of void in 'C'
+    
+    // STEP 2:
+    // Solve the function
+    let func5 = Fsolve.FunctionToSolve (funcToSolve5)      // Wrap function so it can be called
+    let unknownVariables5 = 2                              // Give number of variables 
+    let xGuess5:double array = Array.zeroCreate 2          // Give a guess value
+    let solveResult5 = Fsolve.Fsolver(func5, unknownVariables5, xGuess5, Tolerance) // Call solver
+    let (soln5, fx5, solutionCode5) = solveResult5        // Returns solution:
+    // soln5 = Array containing solution
+    // fx5 = Values of equations at soln5 (should be close to zero within Tolerance)
+    // solutionCode5 = String providing information on exit code
+    Fsolve.PrintArray "xSolution" soln5 4                  // Prints the solution to '7' decimals
+
+
+
+    // ============================================
+    // ....... TEST 6 .............................
+    // ....... Non Linear System ..................
+    // ....... Unknown variables = 2 ..............
+    // ============================================
+    //
+    // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+    //
+    // Equations:
+    //
+    // 2x1 − x2  = e**(−x1)
+    // −x1 + 2x2 = e**(−x2)
+    //
+    // Solutions:
+    // 0.5671    0.5671
+   
+    // STEP 1: 
+    // Define the callback function for this system
+    let funcToSolve6 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
+        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        fx1[0] <- 2.0*x1[0] - x1[1] - exp(-x1[0])        // Write equations/functions as f(x) = 0
+        fx1[1] <- -x1[0] + 2.0*x1[1] - exp(-x1[1])
+        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        ()                                               // Returns equivalent of void in 'C'
+    
+    // STEP 2:
+    // Solve the function
+    let func6 = Fsolve.FunctionToSolve (funcToSolve6)      // Wrap function so it can be called
+    let unknownVariables6 = 2                              // Give number of variables 
+    let xGuess6:double array = Array.zeroCreate 2          // Give a guess value
+    let solveResult6 = Fsolve.Fsolver(func6, unknownVariables6, xGuess6, Tolerance) // Call solver
+    let (soln6, fx6, solutionCode6) = solveResult6        // Returns solution:
+    // soln6 = Array containing solution
+    // fx6 = Values of equations at soln6 (should be close to zero within Tolerance)
+    // solutionCode6 = String providing information on exit code
+    Fsolve.PrintArray "xSolution" soln6 4                  // Prints the solution to '7' decimals
+
     0

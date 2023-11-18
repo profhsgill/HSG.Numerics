@@ -71,6 +71,32 @@ Module FsolveTester
         ' solutionCode4 = String providing information on exit code
         Fsolve.PrintArray("x", solveResult4.Item1, 7)
 
+
+        ' Solve function 5
+        ' ----------------
+        Dim func5 As New Fsolve.FunctionToSolve(AddressOf funcToSolve5) ' Wrap function so it can be called
+        Dim unknownVariables5 As Integer = 2                            ' Give number of variables 
+        Dim xGuess5() = {0.0, 0.0}   ' Give a guess value
+        Dim solveResult5 = Fsolve.Fsolver(func5, unknownVariables5, xGuess5, Tolerance) ' Call solver
+        ' Returns solution:
+        ' soln5 = Array containing solution
+        ' fx5 = Values of equations at soln5 (should be close to zero within Tolerance)
+        ' solutionCode4 = String providing information on exit code
+        Fsolve.PrintArray("x", solveResult5.Item1, 4)
+
+
+        ' Solve function 6
+        ' ----------------
+        Dim func6 As New Fsolve.FunctionToSolve(AddressOf funcToSolve6) ' Wrap function so it can be called
+        Dim unknownVariables6 As Integer = 2                            ' Give number of variables 
+        Dim xGuess6() = {0.0, 0.0}   ' Give a guess value
+        Dim solveResult6 = Fsolve.Fsolver(func6, unknownVariables6, xGuess6, Tolerance) ' Call solver
+        ' Returns solution:
+        ' soln6 = Array containing solution
+        ' fx6 = Values of equations at soln6 (should be close to zero within Tolerance)
+        ' solutionCode6 = String providing information on exit code
+        Fsolve.PrintArray("x", solveResult6.Item1, 4)
+
     End Sub
 
 
@@ -163,7 +189,7 @@ Module FsolveTester
     Sub funcToSolve4(n As Integer, x As IntPtr, fx As IntPtr)           ' This is the function signature
         Dim x1() As Double = Fsolve.ExtractArrayFromPointer(n, x)       ' Make an array for 'x' values from its Pointer
         Dim fx1() As Double = Fsolve.ExtractArrayFromPointer(n, fx)     ' Make an array for 'fx' equation/function values from its Pointer
-        For k As Integer = 0 To n - 1                                   ' Write equations/functions as f(x) = 0XXXXXXXXXXXXXXXXXXXXXXXXX ZXZX
+        For k As Integer = 0 To n - 1                                   ' Write equations/functions as f(x) = 0
             Dim temp As Double = (3.0 - 2.0 * x1(k)) * x1(k)
             Dim temp1 As Double = If((k <> 0), x1(k - 1), 0.0)
             Dim temp2 As Double = If((k <> n - 1), x1(k + 1), 0.0)
@@ -171,5 +197,56 @@ Module FsolveTester
         Next
         Fsolve.CopyArrayToPointer(n, fx1, fx)                           ' Copy fx array values to fx PointerC
     End Sub
+
+
+
+    ' ============================================
+    ' ....... TEST 5 .............................
+    ' ....... Non Linear System ..................
+    ' ....... Unknown variables = 2 ..............
+    ' ============================================
+    '
+    ' This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+    '
+    ' Equations:
+    '
+    ' e^(?e^(?(x1+x2))) = x2*(1+x1^2)
+    ' x1*cos(x2) + x2*sin(x1) = 0.5
+    ' 
+    ' Solutions:
+    ' 0.3532    0.6061
+    Sub funcToSolve5(n As Integer, x As IntPtr, fx As IntPtr)         ' This is the function signature
+        Dim x1() As Double = Fsolve.ExtractArrayFromPointer(n, x)     ' Make an array for 'x' values from its Pointer
+        Dim fx1() As Double = Fsolve.ExtractArrayFromPointer(n, fx)   ' Make an array for 'fx' equation/function values from its Pointer
+        fx1(0) = Math.Exp(-Math.Exp(-(x1(0) + x1(1)))) - x1(1) * (1.0 + x1(0) ^ 2) ' Write equations/functions as f(x) = 0
+        fx1(1) = x1(0) * Math.Cos(x1(1)) + x1(1) * Math.Sin(x1(0)) - 0.5
+        Fsolve.CopyArrayToPointer(n, fx1, fx)                         ' Copy fx array values to fx Pointer
+    End Sub
+
+
+
+    ' ============================================
+    ' ....... TEST 6 .............................
+    ' ....... Non Linear System ..................
+    ' ....... Unknown variables = 2 ..............
+    ' ============================================
+    '
+    ' This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+    '
+    ' Equations:
+    '
+    ' 2x1 ? x2  = e^(?x1)
+    ' ?x1 + 2x2 = e^(?x2)
+    '
+    ' Solutions:
+    ' 0.5671    0.5671
+    Sub funcToSolve6(n As Integer, x As IntPtr, fx As IntPtr)         ' This is the function signature
+        Dim x1() As Double = Fsolve.ExtractArrayFromPointer(n, x)     ' Make an array for 'x' values from its Pointer
+        Dim fx1() As Double = Fsolve.ExtractArrayFromPointer(n, fx)   ' Make an array for 'fx' equation/function values from its Pointer
+        fx1(0) = 2.0 * x1(0) - x1(1) - Math.Exp(-x1(0))               ' Write equations/functions as f(x) = 0
+        fx1(1) = -x1(0) + 2.0 * x1(1) - Math.Exp(-x1(1))
+        Fsolve.CopyArrayToPointer(n, fx1, fx)                         ' Copy fx array values to fx Pointer
+    End Sub
+
 
 End Module
