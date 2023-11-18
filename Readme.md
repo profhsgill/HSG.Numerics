@@ -29,14 +29,31 @@ Use nuget to install.
 ```bash
 dotnet add package HSG.Numerics
 ```
-`OR` for F# script files add the following at the top of the script file.
+
+`OR` 
+
 ```bash
-#r "nuget: HSG.Numerics, 1.0.0"
+In Visual Studio right click on project in Solution Explorer and in the menu that appears click on 'Manage NuGet Packages'. Then 'browse' to find HSG.Numerics and install it.
 ```
 
 ## Compatibility
 
-The dlls were compiled for .Net 6 on Windows 10. But they should likely work on Windows 11. I have not checked other Operating Systems.
+- The dlls were compiled for .Net 6 on Windows 10. But they should likely work on Windows 11. 
+
+- Library has not been checked for other Operating Systems.
+
+- fsharp.core with version number at least 7.0.401 is required (because dlls were compiled with this version).
+
+
+## Known issues
+
+When the library is included in an interactive script file for F# as follows:
+
+ `#r "nuget: HSG.Numerics, 1.0.1"` 
+ 
+ an error gets raised that reads "bad cli header, rva 0".
+
+ The library must be added into a .fs file in a "non interactive" manner and compiled.
 
 
 
@@ -110,7 +127,7 @@ let main argv =
 `C#`
 
 ```C#
- using HSG.Numerics;
+using HSG.Numerics;
 
 namespace FsolveTester
 {
