@@ -1,0 +1,10 @@
+https://github.com/profhsgill/HSG.Numerics.git
+
+git add .
+
+git commit -m mit "Updating example files and source files"
+
+git push -u origin main (update git)
+
+git push -u -f origin main (force update git repo)
+
