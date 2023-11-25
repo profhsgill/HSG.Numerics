@@ -5,21 +5,19 @@ HSG.Numerics provides a solver for a system of nonlinear and linear equations wi
 
 ## Motivation and Background
 
-- While learning F# I had to solve a system of nonlinear equations. I searched a lot but could not find an implementation of a nonlinear solver for a system of equations for F# nor for C#. 
+- SciPy/Python and MATLAB have a function called ***fsolve*** to solve a sytem of nonlinear equations. It is based on [MINPACK](https://www.mcs.anl.gov/~more/ANL8074a.pdf).
 
-- SciPy/Python and MATLAB have a function called ***fsolve*** to solve a sytem of nonlinear equations. I then started researching into ways to write an fsolve function for F#.
+- HSG.Numerics provides a similar ***fsolve*** function using the C implementation of [fsolve](https://people.sc.fsu.edu/~jburkardt/c_src/fsolve/fsolve.html), which is also based on MINPACK. 
 
-- Since the ***fsolve*** function of SciPy and MATLAB uses MINPACK, I started looking into numerous implementations of [MINPACK](https://www.mcs.anl.gov/~more/ANL8074a.pdf). Because MINPACK is written in FORTRAN, its direct consumption in F# is difficult so I looked at C language implementations of MINPACK. However, the C implementations of MINPACK became difficult to consume in F# due to lack of examples or custom data structures implemented by these libraries.
+- This function can be called by all the .Net languages: F#, C#, and VB.
 
-- I then stumbled upon the C implementation of [fsolve](https://people.sc.fsu.edu/~jburkardt/c_src/fsolve/fsolve.html) by John Burkardt. This implementation uses built in data types of C without introducing custom data types, and it seemed plausible that I might be able to consume it in F#.
 
-- I had to start learning Interoperability between native C code and F# code. It was a steep learning curve, but in the end I succeeded in writing a library that uses the John Burkardt fsolve code written in C and allows its use in F#. I wrote the F# code in a way that it can also be consumed in C# and VB.
+## Version notice
 
-- The most difficult part was to determine how a function written in F# that takes in guess values of unknown variable (say 'x') and returns an array of equation values at this 'x' can be passed to C code where the fsolve function can repeatedly call it in an iterating loop.
+Starting version 1.0.4 and above the names of the following functions have been changed.
 
-- The HSG.Numerics is a result of this effort. It can now be called by all the .Net languages: F#, C#, and VB.
-
-- I hope this will be useful to others.
+- *Fsolve.ExtractArrayFromPointer* is now called *Fsolve.MakeArray*
+- *Fsolve.CopyArrayToPointer* is now called *Fsolve.CopyArray*
 
 
 ## Installation
@@ -36,20 +34,22 @@ dotnet add package HSG.Numerics
 In Visual Studio right click on project in Solution Explorer and in the menu that appears click on 'Manage NuGet Packages'. Then 'browse' to find HSG.Numerics and install it.
 ```
 
-## Compatibility
+
+## Compatibility 
 
 - The dlls were compiled for .Net 6 on Windows 10. But they should likely work on Windows 11. 
 
 - Library has not been checked for other Operating Systems.
 
-- fsharp.core with version number at least 7.0.401 is required (because dlls were compiled with this version).
+- fsharp.core with version number at least 8.0.100 is required (because dlls were compiled with this version).
+
 
 
 ## Known issues
 
 When the library is included in an interactive script file for F# as follows:
 
- `#r "nuget: HSG.Numerics, 1.0.1"` 
+  `#r "nuget: HSG.Numerics, 1.0.3"` (any version)
  
  an error gets raised that reads "bad cli header, rva 0".
 
@@ -59,9 +59,8 @@ When the library is included in an interactive script file for F# as follows:
 
 ## Examples
 
-One example for each F#, C# and VB is given below.
+One example is given below for F#, C# and VB. More can be found at project github repo [HSG.Numerics](https://github.com/profhsgill/HSG.Numerics)
 
-More examples can be found in the 'examples' folder
 
 `F#`
 
@@ -97,15 +96,15 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve4 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer                   
         for k = 0 to n-1 do                              // Write equations/functions as f(x) = 0
             let temp = (3.0 - 2.0*x1[k])*x1[k]
             let temp1 = if k <> 0 then x1[k - 1] else 0.0
             let temp2 = if k <> n-1 then x1[k + 1] else 0.0
             fx1[k] <- temp - temp1 - 2.0*temp2 + 1.0
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
-        ()                                               // Returns equivalent of void in 'C'
+        Fsolve.CopyArray n fx1 fx               // Copy fx array values to fx Pointer
+        ()                                      // Returns equivalent of void in 'C'
     
     // STEP 2:
     // Solve the function
@@ -127,7 +126,7 @@ let main argv =
 `C#`
 
 ```C#
-using HSG.Numerics;
+ using HSG.Numerics;
 
 namespace FsolveTester
 {
@@ -164,8 +163,8 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve4(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 for (int k = 0; k < n; k++)                           // Write equations/functions as f(x) = 0
                 {
                     double temp = (3.0 - 2.0 * x1[k]) * x1[k];
@@ -173,7 +172,7 @@ namespace FsolveTester
                     double temp2 = k != n - 1 ? x1[k + 1] : 0.0;
                     fx1[k] = temp - temp1 - 2.0 * temp2 + 1.0;
                 }
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
             // STEP 2:
             // Solve the function
@@ -242,15 +241,15 @@ Module FsolveTester
     ' -0.7042129      -0.7013690      -0.6918656
     ' -0.6657920      -0.5960342      -0.4164121
     Sub funcToSolve4(n As Integer, x As IntPtr, fx As IntPtr)           ' This is the function signature
-        Dim x1() As Double = Fsolve.ExtractArrayFromPointer(n, x)       ' Make an array for 'x' values from its Pointer
-        Dim fx1() As Double = Fsolve.ExtractArrayFromPointer(n, fx)     ' Make an array for 'fx' equation/function values from its Pointer
-        For k As Integer = 0 To n - 1                                   ' Write equations/functions as f(x) = 0XXXXXXXXXXXXXXXXXXXXXXXXX ZXZX
+        Dim x1() As Double = Fsolve.MakeArray(n, x)       ' Make an array for 'x' values from its Pointer
+        Dim fx1() As Double = Fsolve.MakeArray(n, fx)     ' Make an array for 'fx' equation/function values from its Pointer
+        For k As Integer = 0 To n - 1                                   ' Write equations/functions as f(x) = 0
             Dim temp As Double = (3.0 - 2.0 * x1(k)) * x1(k)
             Dim temp1 As Double = If((k <> 0), x1(k - 1), 0.0)
             Dim temp2 As Double = If((k <> n - 1), x1(k + 1), 0.0)
             fx1(k) = temp - temp1 - 2.0 * temp2 + 1.0
         Next
-        Fsolve.CopyArrayToPointer(n, fx1, fx)                           ' Copy fx array values to fx PointerC
+        Fsolve.CopyArray(n, fx1, fx)                           ' Copy fx array values to fx Pointer
     End Sub
 
 End Module

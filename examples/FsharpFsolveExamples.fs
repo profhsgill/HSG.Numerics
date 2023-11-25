@@ -22,10 +22,10 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this equation
     let funcToSolve1 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer
         fx1[0] <- x1[0] - 1.0                            // Write equations/functions as f(x) = 0, here it becomes x - 1 = 0
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
         ()                                               // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -59,12 +59,12 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve2 (n:int) (x: IntPtr) (fx: IntPtr) =   // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x       // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx     // Make an array for 'fx' equation/function values from its Pointer
+        let x1 = Fsolve.MakeArray n x       // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx     // Make an array for 'fx' equation/function values from its Pointer
         fx1[0] <- -1.0 * x1[0] + 3.0 * x1[1] + 7.0 * x1[2]// Write equations/functions as f(x) = 0
         fx1[1] <- 2.0 * x1[0] - 2.0 * x1[1] - 1.0 * x1[2]
         fx1[2] <- x1[0] + x1[1] + x1[2] - 1.0
-        Fsolve.CopyArrayToPointer n fx1 fx                // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx                // Copy fx1 array values to fx Pointer
         ()                                                // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -98,11 +98,11 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve3 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer
         fx1[0] <- x1[0] + x1[1] - 1.0                    // Write equations/functions as f(x) = 0
         fx1[1] <- x1[0]*x1[0] - x1[1] - 5.0
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
         ()                                               // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -156,14 +156,14 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve4 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer                   
         for k = 0 to n-1 do                              // Write equations/functions as f(x) = 0
             let temp = (3.0 - 2.0*x1[k])*x1[k]
             let temp1 = if k <> 0 then x1[k - 1] else 0.0
             let temp2 = if k <> n-1 then x1[k + 1] else 0.0
             fx1[k] <- temp - temp1 - 2.0*temp2 + 1.0
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
         ()                                               // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -200,12 +200,12 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve5 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer                   
         fx1[0] <- exp(-exp(-(x1[0]+x1[1]))) - x1[1]*(1.0+x1[0]**2) // Write equations/functions as f(x) = 0
         fx1[1] <- x1[0]*cos x1[1] + x1[1]*sin x1[0] - 0.5
             
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
         ()                                               // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -241,11 +241,11 @@ let main argv =
     // STEP 1: 
     // Define the callback function for this system
     let funcToSolve6 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.ExtractArrayFromPointer n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.ExtractArrayFromPointer n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer                   
         fx1[0] <- 2.0*x1[0] - x1[1] - exp(-x1[0])        // Write equations/functions as f(x) = 0
         fx1[1] <- -x1[0] + 2.0*x1[1] - exp(-x1[1])
-        Fsolve.CopyArrayToPointer n fx1 fx               // Copy fx array values to fx Pointer
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
         ()                                               // Returns equivalent of void in 'C'
     
     // STEP 2:
@@ -259,5 +259,48 @@ let main argv =
     // fx6 = Values of equations at soln6 (should be close to zero within Tolerance)
     // solutionCode6 = String providing information on exit code
     Fsolve.PrintArray "xSolution" soln6 4                  // Prints the solution to '7' decimals
+
+
+
+    // ============================================
+    // ....... TEST 7 .............................
+    // ....... Non Linear System ..................
+    // ....... Unknown variables = 1 ..............
+    // ============================================
+    //
+    // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+    //
+    // Equations:
+    //
+    //  a(1+cos(b))**2 = 4x * exp(-2c*(a-x)**2) 
+    //  
+    //
+    // Solutions:
+    // Depends on a, b, c
+    // 0.70548923 for a = b = c = 1
+   
+    // STEP 1: 
+    // Define the callback function for this system
+    let funcToSolve7 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
+        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
+        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer           
+        let a = 1.0
+        let b = 1.0
+        let c = 1.0
+        fx1[0] <- a*(1.0+cos(b))**2 - 4.0*x1[0] * exp(-2.0*c*(a-x1[0])**2) // Write equations/functions as f(x) = 0
+        Fsolve.CopyArray n fx1 fx               // Copy fx1 array values to fx Pointer
+        ()                                               // Returns equivalent of void in 'C'
+    
+    // STEP 2:
+    // Solve the function
+    let func7 = Fsolve.FunctionToSolve (funcToSolve7)      // Wrap function so it can be called
+    let unknownVariables7 = 1                              // Give number of variables 
+    let xGuess7:double array = Array.zeroCreate 1          // Give a guess value
+    let solveResult7 = Fsolve.Fsolver(func7, unknownVariables7, xGuess7, Tolerance) // Call solver
+    let (soln7, fx7, solutionCode7) = solveResult7        // Returns solution:
+    // soln7 = Array containing solution
+    // fx7 = Values of equations at soln6 (should be close to zero within Tolerance)
+    // solutionCode7 = String providing information on exit code
+    Fsolve.PrintArray "xSolution" soln7 8                  // Prints the solution to '7' decimals
 
     0

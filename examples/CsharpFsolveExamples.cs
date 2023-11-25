@@ -1,4 +1,4 @@
-﻿ using HSG.Numerics;
+﻿using HSG.Numerics;
 using static Microsoft.FSharp.Core.ByRefKinds;
 
 namespace FsolveTester
@@ -28,15 +28,15 @@ namespace FsolveTester
             // Define the callback function for this equation
             static void funcToSolve1(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 fx1[0] = x1[0] - 1.0;                                 // Write equations/functions as f(x) = 0, here it becomes x - 1 = 0
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
 
             // STEP 2:
             // Solve the function
-            Fsolve.FunctionToSolve func1 = new (funcToSolve1);        // Wrap function so it can be called
+            Fsolve.FunctionToSolve func1 = new(funcToSolve1);        // Wrap function so it can be called
             int unknownVariables1 = 1;                                // Give number of variables
             double[] xGuess1 = { -1.0 };                              // Give a guess value
             (double[] soln1, double[] fx1, string solutionCode1) = Fsolve.Fsolver(func1, unknownVariables1, xGuess1, Tolerance); // Call solver
@@ -44,7 +44,7 @@ namespace FsolveTester
             // soln1 = Array containing solution
             // fx1 = Values of equations at soln1 (should be close to zero within Tolerance)
             // solutionCode1 = String providing information on exit code
-            Fsolve.PrintArray ("xSolution", soln1, 8);                // Prints the solution to '8' decimals
+            Fsolve.PrintArray("xSolution", soln1, 8);                // Prints the solution to '8' decimals
 
 
 
@@ -66,19 +66,19 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve2(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 fx1[0] = -x1[0] + 3.0 * x1[1] + 7.0 * x1[2];          // Write equations/functions as f(x) = 0
-                fx1[1] = 2.0*x1[0] - 2.0*x1[1] - x1[2];
+                fx1[1] = 2.0 * x1[0] - 2.0 * x1[1] - x1[2];
                 fx1[2] = x1[0] + x1[1] + x1[2] - 1.0;
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
 
             // STEP 2:
             // Solve the function
             Fsolve.FunctionToSolve func2 = new(funcToSolve2);        // Wrap function so it can be called
             int unknownVariables2 = 3;                               // Give number of variables
-            double[] xGuess2 = { 0.0, 0.0, 0.0};                     // Give a guess value
+            double[] xGuess2 = { 0.0, 0.0, 0.0 };                     // Give a guess value
             (double[] soln2, double[] fx2, string solutionCode2) = Fsolve.Fsolver(func2, unknownVariables2, xGuess2, Tolerance); // Call solver
             // Returns solution:
             // soln2 = Array containing solution
@@ -105,11 +105,11 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve3(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 fx1[0] = x1[0] + x1[1] - 1.0;                         // Write equations/functions as f(x) = 0
                 fx1[1] = x1[0] * x1[0] - x1[1] - 5.0;
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
 
             // STEP 2:
@@ -166,8 +166,8 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve4(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 for (int k = 0; k < n; k++)                           // Write equations/functions as f(x) = 0
                 {
                     double temp = (3.0 - 2.0 * x1[k]) * x1[k];
@@ -175,7 +175,7 @@ namespace FsolveTester
                     double temp2 = k != n - 1 ? x1[k + 1] : 0.0;
                     fx1[k] = temp - temp1 - 2.0 * temp2 + 1.0;
                 }
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
             // STEP 2:
             // Solve the function
@@ -211,11 +211,11 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve5(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 fx1[0] = Math.Exp(-Math.Exp(-(x1[0] + x1[1]))) - x1[1] * (1.0 + x1[0] * x1[0]); // Write equations/functions as f(x) = 0
                 fx1[1] = x1[0] * Math.Cos(x1[1]) + x1[1] * Math.Sin(x1[0]) - 0.5;
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
             // STEP 2:
             // Solve the function
@@ -251,11 +251,11 @@ namespace FsolveTester
             // Define the callback function for this system
             static void funcToSolve6(int n, IntPtr x, IntPtr fx)      // This is the function signature
             {
-                double[] x1 = Fsolve.ExtractArrayFromPointer(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.ExtractArrayFromPointer(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
                 fx1[0] = 2.0 * x1[0] - x1[1] - Math.Exp(-x1[0]);   // Write equations/functions as f(x) = 0
                 fx1[1] = -x1[0] + 2.0 * x1[1] - Math.Exp(-x1[1]);
-                Fsolve.CopyArrayToPointer(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
             }
             // STEP 2:
             // Solve the function
@@ -270,6 +270,51 @@ namespace FsolveTester
             Fsolve.PrintArray("xSolution", soln6, 4);                // Prints the solution to '7' decimals
 
 
+
+            // ============================================
+            // ....... TEST 7 .............................
+            // ....... Non Linear System ..................
+            // ....... Unknown variables = 1 ..............
+            // ============================================
+            //
+            // This is an example from https://www.mathworks.com/help/optim/ug/fsolve.html
+            //
+            // Equations:
+            //
+            //  a(1+cos(b))**2 = 4x * exp(-2c*(a-x)**2) 
+            //  
+            //
+            // Solutions:
+            // Depends on a, b, c
+            // 0.70548923 for a = b = c = 1
+
+            // STEP 1: 
+            // Define the callback function for this system
+            static void funcToSolve7(int n, IntPtr x, IntPtr fx)      // This is the function signature
+            {
+                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
+                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                double a = 1.0;
+                double b = 1.0;
+                double c = 1.0;
+                // Write equations/functions as f(x) = 0
+                Double term1 = 1.0 + Math.Cos(b);
+                Double term2 = -2.0 * c * (a - x1[0]) * (a - x1[0]);
+                fx1[0] = a * term1*term1 - 
+                         4.0 * x1[0] * Math.Exp(term2);
+                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+            }
+            // STEP 2:
+            // Solve the function
+            Fsolve.FunctionToSolve func7 = new(funcToSolve7);        // Wrap function so it can be called
+            int unknownVariables7 = 1;                               // Give number of variables
+            double[] xGuess7 = { 0.0 };  // Give a guess value
+            (double[] soln7, double[] fx7, string solutionCode7) = Fsolve.Fsolver(func7, unknownVariables7, xGuess7, Tolerance); // Call solver
+            // Returns solution:
+            // soln7= Array containing solution
+            // fx7 = Values of equations at soln6 (should be close to zero within Tolerance)
+            // solutionCode7 = String providing information on exit code
+            Fsolve.PrintArray("xSolution", soln7, 8);                // Prints the solution to '7' decimals
         }
     }
 }

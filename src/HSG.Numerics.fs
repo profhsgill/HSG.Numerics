@@ -97,7 +97,7 @@ module Fsolve =
     /// <param name="n"> Number of array elements </param>
     /// <param name="ptr"> Pointer to starting location of the Array</param>
     /// <returns> Array of Double [] </returns>
-    let ExtractArrayFromPointer (arrayElementCount:int) (pointer:IntPtr) =
+    let MakeArray (arrayElementCount:int) (pointer:IntPtr) =
         let mutable array:double[] = Array.zeroCreate arrayElementCount
         Marshal.Copy(pointer, array, 0, arrayElementCount) // Copy pointer values to array
         array // Return array
@@ -110,7 +110,7 @@ module Fsolve =
     /// <param name="sourceArray"> Array containing values to be copied</param>
     /// <param name="ptrDestination"> Pointer(address) where Array is to be copied</param>
     /// <returns> No return </returns>
-    let CopyArrayToPointer (arrayElementCount:int) (sourceArray:double[]) (destinationPointer:IntPtr) =
+    let CopyArray (arrayElementCount:int) (sourceArray:double[]) (destinationPointer:IntPtr) =
         Marshal.Copy(sourceArray, 0, destinationPointer, arrayElementCount)
     
 
