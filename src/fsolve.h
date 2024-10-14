@@ -1,6 +1,7 @@
 __declspec(dllexport)
 void dogleg(int n, double r[], int lr, double diag[], double qtb[],
 	double delta, double x[], double wa1[], double wa2[]);
+
 __declspec(dllexport)
 double enorm(int n, double x[]);
 

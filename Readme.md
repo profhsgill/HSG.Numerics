@@ -7,17 +7,14 @@ HSG.Numerics provides a solver for a system of nonlinear and linear equations wi
 
 - SciPy/Python and MATLAB have a function called ***fsolve*** to solve a sytem of nonlinear equations. It is based on [MINPACK](https://www.mcs.anl.gov/~more/ANL8074a.pdf).
 
-- HSG.Numerics provides a similar ***fsolve*** function using the C implementation of [fsolve](https://people.sc.fsu.edu/~jburkardt/c_src/fsolve/fsolve.html), which is also based on MINPACK. 
+- HSG.Numerics provides a similar ***fsolve*** function using the C implementation of [fsolve](https://people.sc.fsu.edu/~jburkardt/c_src/fsolve/fsolve.html) by John Burkardt, which is also based on MINPACK. 
 
 - This function can be called by all the .Net languages: F#, C#, and VB.
 
 
 ## Version notice
 
-Starting version 1.0.4 and above the names of the following functions have been changed.
-
-- *Fsolve.ExtractArrayFromPointer* is now called *Fsolve.MakeArray*
-- *Fsolve.CopyArrayToPointer* is now called *Fsolve.CopyArray*
+Starting version 1.0.5 the usage has been simplified. The user has to just define the function to be solved and then pass it to the solver. Other aspects of handling C interoperability are handled by the library.
 
 
 ## Installation
@@ -35,6 +32,7 @@ In Visual Studio right click on project in Solution Explorer and in the menu tha
 ```
 
 
+
 ## Compatibility 
 
 - The dlls were compiled for .Net 6 on Windows 10. But they should likely work on Windows 11. 
@@ -49,11 +47,12 @@ In Visual Studio right click on project in Solution Explorer and in the menu tha
 
 When the library is included in an interactive script file for F# as follows:
 
-  `#r "nuget: HSG.Numerics, 1.0.3"` (any version)
+ `#r "nuget: HSG.Numerics, 1.0.5"` (any version)
  
  an error gets raised that reads "bad cli header, rva 0".
 
  The library must be added into a .fs file in a "non interactive" manner and compiled.
+
 
 
 
@@ -94,24 +93,22 @@ let main argv =
     // -0.6657920      -0.5960342      -0.4164121
    
     // STEP 1: 
-    // Define the callback function for this system
-    let funcToSolve4 (n:int) (x: IntPtr) (fx: IntPtr) =  // This is the function signature
-        let x1 = Fsolve.MakeArray n x      // Make an array for 'x' values from its Pointer
-        let fx1 = Fsolve.MakeArray n fx    // Make an array for 'fx' equation/function values from its Pointer                   
+    // Define the function for this equation
+    let funcToSolve4 (x: double[]) =  // This is the function signature          
+        let n = x.Length
+        let fx = Array.zeroCreate n
         for k = 0 to n-1 do                              // Write equations/functions as f(x) = 0
-            let temp = (3.0 - 2.0*x1[k])*x1[k]
-            let temp1 = if k <> 0 then x1[k - 1] else 0.0
-            let temp2 = if k <> n-1 then x1[k + 1] else 0.0
-            fx1[k] <- temp - temp1 - 2.0*temp2 + 1.0
-        Fsolve.CopyArray n fx1 fx               // Copy fx array values to fx Pointer
-        ()                                      // Returns equivalent of void in 'C'
+            let temp = (3.0 - 2.0*x[k])*x[k]
+            let temp1 = if k <> 0 then x[k - 1] else 0.0
+            let temp2 = if k <> n-1 then x[k + 1] else 0.0
+            fx[k] <- temp - temp1 - 2.0*temp2 + 1.0
+        fx // Return fx array
     
     // STEP 2:
     // Solve the function
-    let func4 = Fsolve.FunctionToSolve (funcToSolve4)      // Wrap function so it can be called
     let unknownVariables4 = 9                              // Give number of variables 
     let xGuess4:double array = Array.zeroCreate 9          // Give a guess value
-    let solveResult4 = Fsolve.Fsolver(func4, unknownVariables4, xGuess4, Tolerance) // Call solver
+    let solveResult4 = Fsolve.Fsolver(funcToSolve4, unknownVariables4, xGuess4, Tolerance) // Call solver
     let (soln4, fx4, solutionCode4) = solveResult4        // Returns solution:
     // soln4 = Array containing solution
     // fx4 = Values of equations at soln4 (should be close to zero within Tolerance)
@@ -126,7 +123,7 @@ let main argv =
 `C#`
 
 ```C#
- using HSG.Numerics;
+using HSG.Numerics;
 
 namespace FsolveTester
 {
@@ -160,31 +157,31 @@ namespace FsolveTester
             // -0.6657920      -0.5960342      -0.4164121
 
             // STEP 1: 
-            // Define the callback function for this system
-            static void funcToSolve4(int n, IntPtr x, IntPtr fx)      // This is the function signature
+            // Define the function for this equation
+            static double[] funcToSolve4(double[] x)      // This is the function signature
             {
-                double[] x1 = Fsolve.MakeArray(n, x);   // Make an array for 'x' values from its Pointer
-                double[] fx1 = Fsolve.MakeArray(n, fx); // Make an array for 'fx' equation/function values from its Pointer
+                int n = x.Length;
+                double[] fx = new double[n];
                 for (int k = 0; k < n; k++)                           // Write equations/functions as f(x) = 0
                 {
-                    double temp = (3.0 - 2.0 * x1[k]) * x1[k];
-                    double temp1 = k != 0 ? x1[k - 1] : 0.0;
-                    double temp2 = k != n - 1 ? x1[k + 1] : 0.0;
-                    fx1[k] = temp - temp1 - 2.0 * temp2 + 1.0;
+                    double temp = (3.0 - 2.0 * x[k]) * x[k];
+                    double temp1 = k != 0 ? x[k - 1] : 0.0;
+                    double temp2 = k != n - 1 ? x[k + 1] : 0.0;
+                    fx[k] = temp - temp1 - 2.0 * temp2 + 1.0;
                 }
-                Fsolve.CopyArray(n, fx1, fx);                // Copy fx1 array values to fx Pointer
+                return fx;
             }
             // STEP 2:
             // Solve the function
-            Fsolve.FunctionToSolve func4 = new(funcToSolve4);        // Wrap function so it can be called
             int unknownVariables4 = 9;                               // Give number of variables
             double[] xGuess4 = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };  // Give a guess value
-            (double[] soln4, double[] fx4, string solutionCode4) = Fsolve.Fsolver(func4, unknownVariables4, xGuess4, Tolerance); // Call solver
+            (double[] soln4, double[] fx4, string solutionCode4) = Fsolve.Fsolver(funcToSolve4, unknownVariables4, xGuess4, Tolerance); // Call solver
             // Returns solution:
             // soln4 = Array containing solution
             // fx4 = Values of equations at soln4 (should be close to zero within Tolerance)
             // solutionCode4 = String providing information on exit code
             Fsolve.PrintArray("xSolution", soln4, 7);                // Prints the solution to '7' decimals
+
         }
     }
 }
@@ -205,10 +202,9 @@ Module FsolveTester
        
         ' Solve function 4
         ' ----------------
-        Dim func4 As New Fsolve.FunctionToSolve(AddressOf funcToSolve4) ' Wrap function so it can be called
         Dim unknownVariables4 As Integer = 9                            ' Give number of variables 
         Dim xGuess4() = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   ' Give a guess value
-        Dim solveResult4 = Fsolve.Fsolver(func4, unknownVariables4, xGuess4, Tolerance) ' Call solver
+        Dim solveResult4 = Fsolve.Fsolver(AddressOf funcToSolve4, unknownVariables4, xGuess4, Tolerance) ' Call solver
         ' Returns solution:
         ' soln4 = Array containing solution
         ' fx4 = Values of equations at soln4 (should be close to zero within Tolerance)
@@ -240,17 +236,17 @@ Module FsolveTester
     ' -0.5706545      -0.6816283      -0.7017325
     ' -0.7042129      -0.7013690      -0.6918656
     ' -0.6657920      -0.5960342      -0.4164121
-    Sub funcToSolve4(n As Integer, x As IntPtr, fx As IntPtr)           ' This is the function signature
-        Dim x1() As Double = Fsolve.MakeArray(n, x)       ' Make an array for 'x' values from its Pointer
-        Dim fx1() As Double = Fsolve.MakeArray(n, fx)     ' Make an array for 'fx' equation/function values from its Pointer
+    Function funcToSolve4(x() As Double) As Double() ' This is the function signature
+        Dim n As Integer = x.Length ' Find number of elements in 'x' array 
+        Dim fx(n - 1) As Double ' VB uses index to declare array, so use 'n-1' since index starts at '0'
         For k As Integer = 0 To n - 1                                   ' Write equations/functions as f(x) = 0
-            Dim temp As Double = (3.0 - 2.0 * x1(k)) * x1(k)
-            Dim temp1 As Double = If((k <> 0), x1(k - 1), 0.0)
-            Dim temp2 As Double = If((k <> n - 1), x1(k + 1), 0.0)
-            fx1(k) = temp - temp1 - 2.0 * temp2 + 1.0
+            Dim temp As Double = (3.0 - 2.0 * x(k)) * x(k)
+            Dim temp1 As Double = If((k <> 0), x(k - 1), 0.0)
+            Dim temp2 As Double = If((k <> n - 1), x(k + 1), 0.0)
+            fx(k) = temp - temp1 - 2.0 * temp2 + 1.0
         Next
-        Fsolve.CopyArray(n, fx1, fx)                           ' Copy fx array values to fx Pointer
-    End Sub
+        Return fx
+    End Function
 
 End Module
 
