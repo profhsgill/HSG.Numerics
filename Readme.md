@@ -1,6 +1,6 @@
 # HSG.Numerics
 
-HSG.Numerics provides a solver for a system of nonlinear and linear equations with 'n' unknowns. It is inspired by the ***fsolve*** function of SciPy and MATLAB, and can be called from all .Net languages (F#, C#, VB).
+HSG.Numerics provides a solver for a system of nonlinear and linear equations with 'n' unknowns. It is inspired by the ***fsolve*** function of SciPy and MATLAB, and can be called from all .Net languages: F Sharp(F#), C Sharp (C#), and Visual Basic (VB).
 
 
 ## Motivation and Background
